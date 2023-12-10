@@ -1,0 +1,383 @@
+**Cisco IOS
+--Boot
+set
+boot
+flash_init
+dir flash:
+boot system flash:/c/ (directory and file)
+BOOT=flash:c2960-lanbasek9-mz.150-2.SE8.bin
+reload
+
+show file systems
+dir (shows other files/directories)
+cd directory
+
+--To Leave
+exit-1
+end-all sub configs (ctrl-z)
+disable-returns to user EXEC mode from privileged EXEC mode
+
+--Basic(enable) 
+copy running-config startup-config (Saves configuration file) (copy run start)
+show running-config (show run)-use this to see what you have accomplished
+show startup-config (show start)
+show ip interface brief 
+show mac-address-table 
+show dtp
+erase startup-config (erase start)
+ping 192.168.2.1 source 172.16.3.1
+traceroute 192.168.2.1
+mdix auto (auto detects cable)
+
+--configure terminal (config t)
+hostname "name"
+service password-encryption
+enable secret "secret password" (privileged EXEC mode)
+banner motd # "the message of the day" #
+(exit)
+
+	interface connection #(ports,groups,loopbacks,vlans)
+    EX: interface vlan 1 (SVI: Switch Virtual Interface)
+    EX: interface fastethernet 0/1
+	ip address "ip-address" "subnet-mask"
+	no shutdown (keeps the connection up)
+	description
+	
+	line console # (usually 0)
+        line vty #Begining #End
+	password "password" 
+	login (user EXEC mode)
+	(end)
+
+--VLAN
+int #
+    mls qos trust cos (Quality Of Service for IP phones)
+    switchport voice vlan #
+    switchport mode { access | dynamic { auto | desirable } | trunk }
+    switchport access vlan # (Access)
+    switchport mode trunk (vlan trunking)
+    switchport trunk native vlan #
+    switchport nonegotiate 
+    switchport mode dynamic auto
+vlan #
+    name "name"
+
+int vlan #
+    ip add x.x.x.x x.x.x.x
+    no shutdown
+
+trunk
+    interface Gx/x/x.x
+    encapsulation dot1Q x
+    ip add x.x.x.x x.x.x.x
+    (config)ip routing
+	router ospf x
+	network x.x.x.x x.x.x.x area x
+
+EtherChannel
+    int ran x
+        channel-group x mode active
+    int port-channel x
+	switchport mode trunk
+	switchport trunk allowed vlan x,x,x
+
+--DHCP
+no service dhcp
+service dhcp
+ipv6 dhcp relay destination ipv6-address [interface-type interface-number]
+ip dhcp excluded-address low-address [high-address]
+ip dhcp pool (name)
+network x.x.x.x x.x.x.x
+default-router x.x.x.x
+dns-server x.x.x.x
+domain-name (name)
+ip helper-address x.x.x.x
+
+--SLAAC
+(config) 
+ipv6 unicast-routing
+ipv6 dhcp pool IPV6-STATELESS
+    dns-server x::x (ipv6)
+    domain-name (name)
+int #
+    ipv6 nd other-config-flag (default option)
+    ipv6 dhcp server IPV6-STATELESS (stateless)
+    
+    ipv6 enable
+    ipv6 address autoconfig
+    
+    address prefix x::x/x
+    dns-server x::x
+    domain-name (name)
+    ipv6 nd managed-config-flag (stateful)
+    ipv6 nd prefix default no-autoconfig (disables SLAAC)
+
+implementing:
+int #
+    ip address dhcp
+
+--Security
+(disabling ports)
+int ran ports
+shutdown
+
+(port security)
+int #
+    switchport port-security (no dynamic)
+
+(limit mac): 
+switchport port-security maximum x
+switchport port-security mac-address (mac address) (static)
+switchport port-security mac-address sticky (dynamic)
+
+(addresses deleted after a set time)
+switchport port-security aging { static | time time | type {absolute | inactivity}}
+switchport port-security aging time x
+switchport port-security aging type inactivity 
+switchport port-security violation { protect | restrict | shutdown} 
+
+--DHCP SEC
+ip dhcp snooping
+ip dhcp snooping vlan #
+ip arp inspection vlan #
+int #
+    ip dhcp snooping trust
+    ip arp inspection trust
+int ran #
+    ip dhcp snooping limit rate x
+ip dhcp snooping vlan x,x,x-x
+
+--SSH
+(config) 
+service password-encryption (encrypts passwords)
+security password min-length 10
+no ip domain-lookup
+ip domain-name "DN"
+username any_user secret any_password
+crypto key generate rsa (1024 bits)
+login block-for 180 attempts 4 within 120 (blocks for 180 seconds, if wrong login 4 times, within a span of 120 seconds)
+ip ssh version 2
+(line vty 0 15)
+transport input ssh
+login local
+exec-timeout 6
+
+(Access)
+C:\> ssh /?
+Packet Tracer PC SSH
+Usage: SSH -l username target
+C:\>
+
+--conf -> tftp server
+copy run start
+copy start tftp
+server ip
+(name = HOSTNAME-config)
+
+--tftp server -> conf
+copy tftp flash
+remote host: 192.x.x.x
+source filename :
+file name
+
+--ACL
+NOTE: 4 per INT
+Syntax: 
+access-list access-list-number {deny | permit | remark text} source [source-wildcard] [log]
+ip access-list standard (access-list-name)
+ip access-group {access-list-number | access-list-name} {in | out}
+access-class {access-list-number | access-list-name} { in | out } 
+(extended)
+access-list access-list-number {deny | permit | remark text} protocol source source-wildcard [operator {port}] destination destination-wildcard [operator {port}] [established] [log]
+
+
+access-list # permit x.x.x.x(IP)  x.x.x.x(Wildcard) | access-list # permit host x.x.x.x (IP)
+access-list # permit 0.0.0.0 255.255.255.255 (any ip) | access-list # permit any
+exteneded ex) access-list 100 permit tcp 192.168.10.0 0.0.0.255 any eq www
+
+ip access-list extended FTP-FILTER
+    permit tcp x.x.x.x x.x.x.x any eq (ftp | ftp-data)
+
+--Router
+show ip route | begin Gateway
+
+spanning-tree portfast (opens all ports on the ST)
+(security)
+spanning-tree bpduguard enable
+spanning-tree portfast bpduguard default
+show ip protocols | include Router ID
+ip route network-address subnet-mask { ip-address | exit-intf [ip-address]} [distance] 
+ip route 0.0.0.0 0.0.0.0 {ip-address | exit-intf}
+ipv6 route ipv6-prefix/prefix-length {ipv6-address | exit-intf [ipv6-address]} [distance]
+ipv6 route ::/0 {ipv6-address | exit-intf}
+[distance]: G0x/x/x (port) x.x.x.x (ip)
+
+(static)
+(no: resets to default) ip ospf (hello|dead)-interval x(seconds)
+
+(config)ip routing
+    router ospf x
+	default-information originate (advertise)
+	network (network-address) (wildcard-mask) area (area-id)
+        quad 0 network: network x.x.x.x 0.0.0.0 area 0
+        Check Notes Under Route (extra commands, adjacent routers, caculate wildcard mask)
+    network x.x.x.x x.x.x.x area x
+(Configuring ospf)
+(with loopback)
+int loopback x
+    ip address x.x.x.x x.x.x.x
+    (PtP)
+    ip ospf network point-to-point
+    end
+router ospf x
+    router-id x.x.x.x (loopback address if avaliable)
+    end
+clear ip ospf process (reset router id)
+
+(using ip ospf)
+ip ospf (process-id) area (area-id)
+router ospf x
+int #
+    ip ospf x area x
+
+(passive int)
+router ospf x
+    passive-int loopback x
+
+(setting priority)
+ip ospf priority x
+
+int #
+    ip ospf cost # (higher -> more bandwidth)
+
+--NAT
+do show ip nat translations (verify)
+(static)
+ip nat inside source static x.x.x.x (private) x.x.x.x (public) 
+
+(dynamic)
+ip nat pool (pool name) x.x.x.x(start public) x.x.x.x(end public) netmask x.x.x.x
+ip nat inside source list x pool (pool name) (command to use the created pool)
+
+(pat: 1 address)
+ip nat inside source list x int# overload
+
+(pat: pool)
+ip nat inside source list x pool (pool name) overload
+
+int # 
+  (static)
+  ip address x.x.x.x x.x.x.x
+  ip nat (inside | outside)
+  NOTE:inside is private, outside is public
+  (dynamic)
+  ip nat (inside | outside)
+
+--Network Management
+Syslog
+(config)service timestamps log datetime (uses NTP for timestamps)
+(config)logging x.x.x.x (IP of Server) (auto)
+(config)logging host x.x.x.x (IP of Server)
+(config)logging trap notifications 
+(config)logging on
+
+Syslog Levels:
+Emergency:     Level 0:  System Unusable
+Alert:         Level 1:  Immediate Action Needed
+Critical:      Level 2:  Critical Condition
+Error:         Level 3:  Error Condition
+Warning:       Level 4:  Warning Condition
+Notification:  Level 5:  Normal, but Significant Condition
+Informational: Level 6:  Informational Message
+Debugging:     Level 7:  Debugging Message
+
+CDP
+(config)cdp run
+(config-if)cdp enable 
+
+LLDP
+(config)lldp run
+(config-if)lldp transmit
+(config-if)lldp receive
+
+NTP
+clock set x:x:x month dd yyyy 
+show clock detail 
+(config)ntp server 209.165.200.225 
+
+--Key Strokes
+crtl-r = displays previous line
+? = can finish a command or list multiple commands (help)
+tab = can finish a command
+shotened commands = save time
+ctrl-a = goes to the start of the line
+ctrl-shift-6 = abort command
+Up Arrow = calls previous commands
+crtl-c = does not run the command
+
+--Comand Line
+ipconfig (shows IP)
+ipconfig /all (Shows Mac Address)
+arp -a (shows the arp table)
+arp -d (deletes the arp table) 
+ping (tests connectivity between devices)
+routing table: netstat -r (windows) show ip route (IOS)
+ipconfig /release
+ipconfig /renew
+netstat 
+netsh interface ipv6 show neighbor
+
+--Connections
+Console: RS-32 -> Router/Switch Console port
+Router -> Router: Serial DTE
+Switch -> Switch: Copper Crossover or Fiber
+PC -> Switch: Copper Straight-Through
+
+--EX VLSM
+                         HOSTS  SIZE   NETWORK ADDRESS   USABLE    BROADCAST
+/25   255.255.255.128    126    128    192.168.1.0       1-126     192.168.1.127
+/26   255.255.255.192    62     64     192.168.1.128     129-190   192.168.1.191
+/30   255.255.255.252    2      4      192.168.1.192     193-194   192.168.1.195
+
+--Other Notes
+Ingress - This is used to describe the port where a frame enters the device.
+Egress - This is used to describe the port that frames will use when leaving the device.
+Popular ports:
+Port 37: Time
+Port 49: TACACS
+Port 53: DNS
+Port 67: DHCP/BOOTP server
+Port 68: DHCP/BOOTP client
+Port 69: TFTP
+Port 137: NetBIOS name service
+Port 138: NetBIOS datagram service
+(Redunudency)
+FHRP
+HSRP
+Violation Mode	Discards Offending Traffic	Sends Syslog Message	Increase Violation Counter	Shuts Down Port
+Protect		      Yes	    			               No			              No				                  No
+Restrict	      Yes	    			               Yes			            Yes				                  No
+Shutdown	      Yes	    			               Yes			            Yes				                  Yes
+
+(Route)
+Number of Adjacencies: n(n-1)/2  n=number of routers
+  area                   OSPF area parameters
+  auto-cost              Calculate OSPF interface cost according to bandwidth
+  default-information    Control distribution of default information
+  distance               Define an administrative distance
+  exit                   Exit from routing protocol configuration mode
+  log-adjacency-changes  Log changes in adjacency state
+  neighbor               Specify a neighbor router
+  network                Enable routing on an IP network
+  no                     Negate a command or set its defaults
+  passive-interface      Suppress routing updates on an interface
+  redistribute           Redistribute information from another routing protocol
+  router-id              router-id for this OSPF process
+
+Some IOS versions allow the subnet mask to be entered instead of the wildcard mask. 
+The IOS then converts the subnet mask to the wildcard mask format.
+Wildcard mask: leftover bits from the subnet mask
+  255.255.255.255
+- xxx.xxx.xxx.xxx
+_________________
+  wildcard mask
