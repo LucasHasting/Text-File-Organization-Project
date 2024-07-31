@@ -45,7 +45,10 @@ The program uses a command line user interface to display contents of a text fil
 
 ## Example
 
-![EXAMPLE](example.png)
+![EXAMPLE](examples/example1.png)  
+![EXAMPLE](examples/example2.png)  
+![EXAMPLE](examples/example3.png)  
+![EXAMPLE](examples/example4.png)  
 
 ## Program-Overview
 
