@@ -17,19 +17,18 @@ This project does not require any external pip packages. You only need [Python](
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/LucasHasting/IP-Subnet-Calculator.git
+    git clone https://github.com/LucasHasting/Text-File-Organization-Project.git
     ```
 
 2. Navigate to the project directory and execute the program:
 
     ```sh
-    cd IP-Subnet-Calculator
-    py subnetting.py
+    cd Text-File-Organization-Project
+    py main.py
     ```
 ### Option 2: without git
 1. Download the project as a zip file
 2. [Extract the zip file](https://www.wikihow.com/Unzip-a-File)
-3. In windows, the subnetting.py file can be clicked to execute
 
 #### Run from the command line
 1. Find the location of the files
@@ -37,12 +36,12 @@ This project does not require any external pip packages. You only need [Python](
 3. go to the command line and run the following:
    ```sh
    cd /path/to/files
-   py subnetting.py
+   py main.py
    ```
 
 ## Usage
 
-The program asks the user to enter an IP address and subnet mask in dotted decimal form, and will output the network address, usables range, and the broadcast address.
+The program uses a command line user interface to display contents of a text file. It uses a numbered menu to select a heading and subheading, all other text that is not selected is filtered. The txt file must use specefic characters to determine a heading and subheading and this can only be changed by modifing lines 4 and 5 in the source code. See [Notice-for-when-the-code-is-read](#notice-for-when-the-code-is-read) for a reason why this is.
 
 ## Example
 
@@ -50,9 +49,7 @@ The program asks the user to enter an IP address and subnet mask in dotted decim
 
 ## Program-Overview
 
-[subnetting.py](https://github.com/LucasHasting/IP-Subnet-Calculator/blob/main/subnetting.py): contains the main driver of the program and is what needs to be executed.   
-[functions_and_constants.py](https://github.com/LucasHasting/IP-Subnet-Calculator/blob/main/functions_and_constants.py): contains the constants used in both programs and the functions used in subnetting.py
-
+[main.py](https://github.com/LucasHasting/IP-Subnet-Calculator/blob/main/subnetting.py): The entire program.
 
 ## Notice-for-when-the-code-is-read
 This project's purpose is the execution of the code, not the beauty of it. This project was a side project I made in highschool. As such, the code is poorly written and hard to read, I appologize for that, but I no longer remember how I made this as it was most likely over complicated and I no longer wish to remember how I made it. 
