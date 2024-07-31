@@ -41,7 +41,7 @@ This project does not require any external pip packages. You only need [Python](
 
 ## Usage
 
-The program uses a command line user interface to display contents of a text file. It uses a numbered menu to select a heading and subheading, all other text that is not selected is filtered out. The txt file must use specefic characters to determine a heading and subheading and this can only be changed by modifing lines 4 and 5 in the source code. See [Notice-for-when-the-code-is-read](#notice-for-when-the-code-is-read) for a reason why this is.
+The program uses a command line user interface to display contents of a text file. It first asks for an input file, then it displays a numbered menu to select a heading and subheading, all other text that is not selected is filtered out. The screen is cleared durring each transistion. The txt file must use specefic characters to determine a heading and subheading and this can only be changed by modifing lines 4 and 5 in the source code. See [Notice-for-when-the-code-is-read](#notice-for-when-the-code-is-read) for a reason why this is.
 
 ## Example
 
